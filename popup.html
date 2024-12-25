@@ -5,23 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
     <title>Shorts & Reels Blocker</title>
-    <style></style>
   </head>
-  <body>
-    <h2>Content Blocker</h2>
+  <body class="shorts_reel_main_container">
+    <div class="extension-header">
+      <h1 class="extension-title">shorts & Reels Blocker</h1>
+    </div>
+
     <div class="toggle-container">
       <label class="switch">
         <input type="checkbox" id="youtubeToggle" />
         <span class="slider"></span>
       </label>
-      <label for="youtubeToggle">Block YouTube Shorts</label>
+      <span class="toggle-label">Block YouTube Shorts</span>
     </div>
+
     <div class="toggle-container">
       <label class="switch">
         <input type="checkbox" id="instagramToggle" />
         <span class="slider"></span>
       </label>
-      <label for="instagramToggle">Block Instagram Reels</label>
+      <span class="toggle-label">Block Instagram Reels</span>
     </div>
     <script src="popup.js"></script>
   </body>
