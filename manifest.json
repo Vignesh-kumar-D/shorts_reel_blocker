@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Shorts & Reels Blocker",
+  "version": "1.0",
+  "description": "Blocks YouTube Shorts and Instagram Reels",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["*://*.youtube.com/*", "*://*.instagram.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.svg"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["youtube_blocker.js"],
+      "css": ["styles.css"]
+    },
+    {
+      "matches": ["*://*.instagram.com/*"],
+      "js": ["instagram_blocker.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
