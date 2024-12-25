@@ -16,7 +16,6 @@ chrome.storage.sync.get(['youtubeBlocked'], function (data) {
 });
 
 function hideYoutubeShorts() {
-  // Hide Shorts from homepage
   const shortsElements = document.querySelectorAll('a[href^="/shorts"]');
   shortsElements.forEach((element) => {
     const container = element.closest(
@@ -27,7 +26,6 @@ function hideYoutubeShorts() {
     }
   });
 
-  // Hide Shorts tab from sidebar
   const shortsTab = document.querySelector('a[title="Shorts"]');
   if (shortsTab) {
     shortsTab.style.display = 'none';

@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const youtubeToggle = document.getElementById('youtubeToggle');
   const instagramToggle = document.getElementById('instagramToggle');
 
-  // Load saved states
   chrome.storage.sync.get(
     ['youtubeBlocked', 'instagramBlocked'],
     function (data) {
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   );
 
-  // Save states on change
   youtubeToggle.addEventListener('change', function () {
     chrome.storage.sync.set({ youtubeBlocked: this.checked });
     updateContentScript('youtube');
