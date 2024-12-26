@@ -3,7 +3,7 @@
   "name": "Shorts & Reels Blocker",
   "version": "1.1",
   "description": "Blocks YouTube Shorts and Instagram Reels",
-  "permissions": ["storage", "scripting", "activeTab"],
+  "permissions": ["storage", "activeTab"],
   "host_permissions": ["*://*.youtube.com/*", "*://*.instagram.com/*"],
   "action": {
     "default_popup": "popup.html",
