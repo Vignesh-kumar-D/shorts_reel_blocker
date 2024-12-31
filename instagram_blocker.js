@@ -1,4 +1,3 @@
-document.head.appendChild(styleSheet);
 chrome.storage.sync.get(['instagramBlocked'], function (data) {
   if (data.instagramBlocked) {
     const observer = new MutationObserver(function (mutations) {
@@ -30,7 +29,7 @@ function hideInstagramReels() {
   const reelsLinks = document.querySelectorAll(
     'a[role="link"][href*="/reels/"]'
   );
-
+  console.log(reelsLinks, 'reelsLinksssss');
   reelsLinks.forEach((link) => {
     const containerWithAria = link.closest('[aria-describedby]');
     if (containerWithAria) {
