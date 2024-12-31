@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.sync.get(
     ['youtubeBlocked', 'instagramBlocked'],
     function (data) {
-      youtubeToggle.checked = data.youtubeBlocked || false;
-      instagramToggle.checked = data.instagramBlocked || false;
+      youtubeToggle.checked = data.youtubeBlocked || true;
+      instagramToggle.checked = data.instagramBlocked || true;
+      chrome.storage.sync.set({ youtubeBlocked: youtubeToggle.checked });
+      chrome.storage.sync.set({ instagramBlocked: instagramToggle.checked });
     }
   );
 
