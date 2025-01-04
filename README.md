@@ -1,4 +1,5 @@
-# Shorts & Reels Blocker: Fight Content Addiction ![icon_128x128](https://github.com/user-attachments/assets/d54742f4-4352-4ec9-96bc-21c7cd3611e9)
+# Shorts & Reels Blocker: Fight Content Addiction 
+![icon_128x128](https://github.com/user-attachments/assets/d54742f4-4352-4ec9-96bc-21c7cd3611e9)
 
 
 ## 🧠 Purpose
