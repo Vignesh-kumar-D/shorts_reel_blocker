@@ -1,4 +1,5 @@
-# Shorts & Reels Blocker: Fight Content Addiction
+# Shorts & Reels Blocker: Fight Content Addiction ![icon_128x128](https://github.com/user-attachments/assets/d54742f4-4352-4ec9-96bc-21c7cd3611e9)
+
 
 ## 🧠 Purpose
 A Chrome extension designed to combat short-form content addiction by blocking YouTube Shorts and Instagram Reels. Take back control of your attention span and enjoy these platforms' valuable content without falling into the endless scroll of short-form videos.
@@ -75,7 +76,13 @@ flowchart TB
 - Event listeners for real-time updates
 
 ## 📸 Screenshots
-[Placeholder: Add screenshots showing before/after states of YouTube and Instagram]
+**Hide shorts Enabled**
+
+<img width="1279" alt="Screenshot 2025-01-05 at 12 37 25 AM" src="https://github.com/user-attachments/assets/6b2730c0-2323-4ca8-96fb-f5b7a45d3ad6" />
+
+**Hide shorts disabled**
+<img width="1280" alt="Screenshot 2025-01-05 at 12 38 43 AM" src="https://github.com/user-attachments/assets/75c1cbe5-35ce-4eb1-98e7-4f23ece65f22" />
+
 
 ## ⚙️ Local Development
 
