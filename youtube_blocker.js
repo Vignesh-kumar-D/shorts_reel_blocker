@@ -19,7 +19,7 @@ function hideYoutubeShorts() {
   const shortsElements = document.querySelectorAll('a[href^="/shorts"]');
   shortsElements.forEach((element) => {
     const container = element.closest(
-      'ytd-rich-section-renderer,ytd-reel-shelf-renderer'
+      'ytd-video-renderer, ytd-rich-section-renderer,ytd-reel-shelf-renderer'
     );
     if (container) {
       container.style.display = 'none';
