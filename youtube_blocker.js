@@ -30,4 +30,14 @@ function hideYoutubeShorts() {
   if (shortsTab) {
     shortsTab.style.display = 'none';
   }
+
+  const chipTextElements = document.querySelectorAll('div, button');
+  chipTextElements.forEach((element) => {
+    if (element.textContent.trim().toLowerCase() === 'shorts') {
+      const container = element.closest('#chip-shape-container');
+      if (container) {
+        container.remove();
+      }
+    }
+  });
 }
