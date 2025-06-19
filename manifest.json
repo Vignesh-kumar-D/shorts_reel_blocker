@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Shorts & Reels Blocker",
-  "version": "1.2",
+  "version": "1.3",
   "description": "Blocks YouTube Shorts and Instagram Reels",
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["*://*.youtube.com/*", "*://*.instagram.com/*"],
