@@ -3,12 +3,20 @@ chrome.storage.sync.get(['instagramBlocked'], function (data) {
     // Cache for already processed elements to avoid re-processing
     const processedElements = new WeakSet();
 
+    // Statistics batching for better performance
+    let statsBatch = {
+      blockedCount: 0,
+      lastUpdate: Date.now(),
+    };
+
+    // Batch statistics updates every 10 seconds instead of every block
+
     // Debounce function to limit execution frequency
     let debounceTimer;
     function debouncedHideReels() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(
-        () => hideInstagramReels(processedElements),
+        () => hideInstagramReels(processedElements, statsBatch),
         150
       );
     }
@@ -48,16 +56,19 @@ chrome.storage.sync.get(['instagramBlocked'], function (data) {
     });
 
     // Initial hide
-    hideInstagramReels(processedElements);
+    hideInstagramReels(processedElements, statsBatch);
 
     // Set up periodic cleanup for better performance
     setInterval(() => {
-      hideInstagramReels(processedElements);
+      hideInstagramReels(processedElements, statsBatch);
     }, 5000); // Check every 5 seconds for any missed elements
   }
 });
 
-function hideInstagramReels(processedElements = new WeakSet()) {
+function hideInstagramReels(
+  processedElements = new WeakSet(),
+  statsBatch = { blockedCount: 0 }
+) {
   let hiddenCount = 0;
 
   // Hide reels with SVG icons
@@ -104,8 +115,35 @@ function hideInstagramReels(processedElements = new WeakSet()) {
     }
   });
 
-  // Only log if something was actually hidden (for debugging)
+  // Add to batch instead of immediate update
   if (hiddenCount > 0) {
-    console.log(`Instagram Reels Blocker: Hidden ${hiddenCount} reel elements`);
+    statsBatch.blockedCount += hiddenCount;
   }
+}
+
+// Optimized batch statistics update
+function updateStatisticsBatch(newlyBlockedCount) {
+  // Only update if there are actually blocked elements
+  if (newlyBlockedCount <= 0) return;
+
+  // Get current statistics once per batch
+  chrome.storage.sync.get(['blockedElements', 'timeSaved'], function (data) {
+    const currentElements = data.blockedElements || 0;
+    const currentTimeSaved = data.timeSaved || 0;
+
+    // Estimate time saved (assume each reel takes 1.5 minutes to watch)
+    const estimatedTimePerElement = 1.5;
+    const additionalTimeSaved = newlyBlockedCount * estimatedTimePerElement;
+
+    // Update statistics
+    const newElements = currentElements + newlyBlockedCount;
+    const newTimeSaved = currentTimeSaved + additionalTimeSaved;
+
+    // Save updated statistics
+    chrome.storage.sync.set({
+      blockedElements: newElements,
+      timeSaved: newTimeSaved,
+      lastUpdate: Date.now(),
+    });
+  });
 }

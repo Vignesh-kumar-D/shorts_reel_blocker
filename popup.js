@@ -7,9 +7,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const timeSaved = document.getElementById('timeSaved');
   const errorMessage = document.getElementById('errorMessage');
   const errorText = document.getElementById('errorText');
+  const resetStatsButton = document.getElementById('resetStats');
 
   // Initialize extension
   initializeExtension();
+
+  // Refresh statistics every 5 seconds when popup is open (reduced from 2 seconds)
+  const statsInterval = setInterval(refreshStatistics, 5000);
+
+  // Clean up interval when popup closes
+  window.addEventListener('beforeunload', () => {
+    clearInterval(statsInterval);
+  });
 
   function initializeExtension() {
     try {
@@ -84,19 +93,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // Reset statistics button
+  resetStatsButton.addEventListener('click', function () {
+    if (
+      confirm(
+        'Are you sure you want to reset your statistics? This action cannot be undone.'
+      )
+    ) {
+      resetStatistics();
+    }
+  });
+
   // Footer link handlers
   document
     .getElementById('privacyLink')
     .addEventListener('click', function (e) {
       e.preventDefault();
-      chrome.tabs.create({ url: 'https://your-privacy-policy-url.com' });
+      chrome.tabs.create({ url: chrome.runtime.getURL('privacy-policy.html') });
     });
 
   document
     .getElementById('feedbackLink')
     .addEventListener('click', function (e) {
       e.preventDefault();
-      chrome.tabs.create({ url: 'https://forms.gle/your-feedback-form' });
+      chrome.tabs.create({
+        url: 'https://chromewebstore.google.com/detail/shorts-reels-blocker/hddclpebfglijbmapdjminkkcafchkmb',
+      });
     });
 
   document.getElementById('rateLink').addEventListener('click', function (e) {
@@ -126,7 +148,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function updateStatistics(elements, minutes) {
     blockedCount.textContent = elements.toLocaleString();
-    timeSaved.textContent = minutes.toLocaleString();
+
+    // Format time saved more nicely
+    if (minutes < 60) {
+      timeSaved.textContent = `${minutes}m`;
+    } else if (minutes < 1440) {
+      // less than 24 hours
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      timeSaved.textContent = `${hours}h ${remainingMinutes}m`;
+    } else {
+      const days = Math.floor(minutes / 1440);
+      const hours = Math.floor((minutes % 1440) / 60);
+      timeSaved.textContent = `${days}d ${hours}h`;
+    }
+  }
+
+  function refreshStatistics() {
+    chrome.storage.sync.get(['blockedElements', 'timeSaved'], function (data) {
+      const elements = data.blockedElements || 0;
+      const minutes = data.timeSaved || 0;
+      updateStatistics(elements, minutes);
+    });
+  }
+
+  function resetStatistics() {
+    try {
+      chrome.storage.sync.set(
+        {
+          blockedElements: 0,
+          timeSaved: 0,
+          lastUpdate: Date.now(),
+        },
+        function () {
+          updateStatistics(0, 0);
+          trackEvent('statistics_reset');
+          showSuccess('Statistics reset successfully!');
+        }
+      );
+    } catch (error) {
+      showError('Failed to reset statistics');
+      console.error('Reset statistics error:', error);
+    }
   }
 
   function showError(message) {
@@ -135,8 +198,21 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(hideError, 5000); // Auto-hide after 5 seconds
   }
 
+  function showSuccess(message) {
+    errorText.textContent = message;
+    errorMessage.style.display = 'block';
+    errorMessage.style.backgroundColor = '#f0fdf4';
+    errorMessage.style.borderColor = '#bbf7d0';
+    errorMessage.style.color = '#166534';
+    setTimeout(hideError, 3000); // Auto-hide after 3 seconds
+  }
+
   function hideError() {
     errorMessage.style.display = 'none';
+    // Reset error message styling
+    errorMessage.style.backgroundColor = '#fef2f2';
+    errorMessage.style.borderColor = '#fecaca';
+    errorMessage.style.color = '#ef4444';
   }
 
   function trackEvent(eventName, parameters = {}) {

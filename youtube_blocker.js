@@ -3,12 +3,27 @@ chrome.storage.sync.get(['youtubeBlocked'], function (data) {
     // Cache for already processed elements to avoid re-processing
     const processedElements = new WeakSet();
 
+    // Statistics batching for better performance
+    let statsBatch = {
+      blockedCount: 0,
+      lastUpdate: Date.now(),
+    };
+
+    // Batch statistics updates every 10 seconds instead of every block
+    const statsInterval = setInterval(() => {
+      if (statsBatch.blockedCount > 0) {
+        updateStatisticsBatch(statsBatch.blockedCount);
+        statsBatch.blockedCount = 0;
+        statsBatch.lastUpdate = Date.now();
+      }
+    }, 10000); // Update every 10 seconds
+
     // Debounce function to limit execution frequency
     let debounceTimer;
     function debouncedHideShorts() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(
-        () => hideYoutubeShorts(processedElements),
+        () => hideYoutubeShorts(processedElements, statsBatch),
         150
       );
     }
@@ -49,23 +64,19 @@ chrome.storage.sync.get(['youtubeBlocked'], function (data) {
     });
 
     // Initial hide
-    hideYoutubeShorts(processedElements);
+    hideYoutubeShorts(processedElements, statsBatch);
 
     // Set up periodic cleanup for better performance
     setInterval(() => {
-      hideYoutubeShorts(processedElements);
+      hideYoutubeShorts(processedElements, statsBatch);
     }, 5000); // Check every 5 seconds for any missed elements
   }
 });
 
-function hideYoutubeShorts(processedElements = new WeakSet()) {
-  // Cache selectors for better performance
-  const shortsSelectors = [
-    'a[href^="/shorts"]',
-    'ytd-reel-shelf-renderer',
-    'a[title="Shorts"]',
-  ];
-
+function hideYoutubeShorts(
+  processedElements = new WeakSet(),
+  statsBatch = { blockedCount: 0 }
+) {
   // Use more specific selectors to avoid expensive operations
   const shortsElements = document.querySelectorAll('a[href^="/shorts"]');
   let hiddenCount = 0;
@@ -119,8 +130,35 @@ function hideYoutubeShorts(processedElements = new WeakSet()) {
     }
   });
 
-  // Only log if something was actually hidden (for debugging)
+  // Add to batch instead of immediate update
   if (hiddenCount > 0) {
-    console.log(`Shorts Blocker: Hidden ${hiddenCount} shorts elements`);
+    statsBatch.blockedCount += hiddenCount;
   }
+}
+
+// Optimized batch statistics update
+function updateStatisticsBatch(newlyBlockedCount) {
+  // Only update if there are actually blocked elements
+  if (newlyBlockedCount <= 0) return;
+
+  // Get current statistics once per batch
+  chrome.storage.sync.get(['blockedElements', 'timeSaved'], function (data) {
+    const currentElements = data.blockedElements || 0;
+    const currentTimeSaved = data.timeSaved || 0;
+
+    // Estimate time saved (assume each short takes 2 minutes to watch)
+    const estimatedTimePerElement = 2;
+    const additionalTimeSaved = newlyBlockedCount * estimatedTimePerElement;
+
+    // Update statistics
+    const newElements = currentElements + newlyBlockedCount;
+    const newTimeSaved = currentTimeSaved + additionalTimeSaved;
+
+    // Save updated statistics
+    chrome.storage.sync.set({
+      blockedElements: newElements,
+      timeSaved: newTimeSaved,
+      lastUpdate: Date.now(),
+    });
+  });
 }

@@ -210,6 +210,41 @@ input:checked + .slider:before {
   transition: all 0.3s ease-out;
 }
 
+.stats-actions {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.reset-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-button:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.reset-button:active {
+  transform: translateY(1px);
+}
+
+.reset-icon {
+  font-size: 1rem;
+}
+
 /* Responsive design */
 @media (max-width: 400px) {
   .shorts_reel_main_container {
