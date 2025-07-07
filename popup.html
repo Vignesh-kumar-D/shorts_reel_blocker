@@ -8,24 +8,71 @@
   </head>
   <body class="shorts_reel_main_container">
     <div class="extension-header">
-      <h1 class="extension-title">Shorts & Reels Blocker</h1>
+      <h1 class="extension-title" id="main-title">Shorts & Reels Blocker</h1>
+      <p class="extension-subtitle">Take control of your digital wellbeing</p>
+    </div>
+
+    <div class="status-indicator" id="statusIndicator">
+      <span class="status-text" id="statusText">All platforms protected</span>
     </div>
 
     <div class="toggle-container">
-      <label class="switch">
-        <input type="checkbox" id="youtubeToggle" />
+      <label class="switch" for="youtubeToggle">
+        <input
+          type="checkbox"
+          id="youtubeToggle"
+          role="switch"
+          aria-describedby="youtubeDescription"
+        />
         <span class="slider"></span>
       </label>
-      <span class="toggle-label">Block YouTube Shorts</span>
+      <div class="toggle-content">
+        <span class="toggle-label">Block YouTube Shorts</span>
+        <span class="toggle-description" id="youtubeDescription"
+          >Hide shorts from homepage, search, and recommendations</span
+        >
+      </div>
     </div>
 
     <div class="toggle-container">
-      <label class="switch">
-        <input type="checkbox" id="instagramToggle" />
+      <label class="switch" for="instagramToggle">
+        <input
+          type="checkbox"
+          id="instagramToggle"
+          role="switch"
+          aria-describedby="instagramDescription"
+        />
         <span class="slider"></span>
       </label>
-      <span class="toggle-label">Block Instagram Reels</span>
+      <div class="toggle-content">
+        <span class="toggle-label">Block Instagram Reels</span>
+        <span class="toggle-description" id="instagramDescription"
+          >Hide reels from feed and explore page</span
+        >
+      </div>
     </div>
+
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" id="blockedCount">0</span>
+        <span class="stat-label">Elements Blocked</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="timeSaved">0</span>
+        <span class="stat-label">Minutes Saved</span>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="#" id="privacyLink" class="footer-link">Privacy Policy</a>
+      <a href="#" id="feedbackLink" class="footer-link">Send Feedback</a>
+      <a href="#" id="rateLink" class="footer-link">Rate Extension</a>
+    </div>
+
+    <div class="error-message" id="errorMessage" style="display: none">
+      <span class="error-text" id="errorText"></span>
+    </div>
+
     <script src="popup.js"></script>
   </body>
 </html>
