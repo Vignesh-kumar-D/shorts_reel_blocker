@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Shorts & Reels Blocker - Digital Wellbeing",
   "version": "1.4.0",
-  "description": "Combat short-form content addiction by blocking YouTube Shorts and Instagram Reels. Improve focus, productivity, and digital wellbeing with this privacy-focused extension.",
+  "description": "Combat short-form content addiction by blocking YouTube Shorts and Instagram Reels.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": ["*://*.youtube.com/*", "*://*.instagram.com/*"],
   "action": {
