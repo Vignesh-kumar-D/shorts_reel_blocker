@@ -121,13 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
 
-  document.getElementById('rateLink').addEventListener('click', function (e) {
-    e.preventDefault();
-    chrome.tabs.create({
-      url: 'https://chromewebstore.google.com/detail/shorts-reels-blocker/hddclpebfglijbmapdjminkkcafchkmb',
-    });
-  });
-
   function updateStatusIndicator(youtubeBlocked, instagramBlocked) {
     const totalBlocked = (youtubeBlocked ? 1 : 0) + (instagramBlocked ? 1 : 0);
 
