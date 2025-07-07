@@ -1,9 +1,46 @@
 chrome.storage.sync.get(['youtubeBlocked'], function (data) {
   if (data.youtubeBlocked) {
+    // Cache for already processed elements to avoid re-processing
+    const processedElements = new WeakSet();
+
+    // Debounce function to limit execution frequency
+    let debounceTimer;
+    function debouncedHideShorts() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(
+        () => hideYoutubeShorts(processedElements),
+        150
+      );
+    }
+
+    // More efficient observer that only triggers on relevant changes
     const observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
-        hideYoutubeShorts();
-      });
+      let shouldUpdate = false;
+
+      for (const mutation of mutations) {
+        // Only process if new nodes were added
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Check if any added nodes might contain shorts
+          for (const node of mutation.addedNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // Quick check for potential shorts content
+              if (
+                node.querySelector &&
+                (node.querySelector('a[href^="/shorts"]') ||
+                  node.querySelector('ytd-reel-shelf-renderer') ||
+                  node.querySelector('a[title="Shorts"]'))
+              ) {
+                shouldUpdate = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (shouldUpdate) {
+        debouncedHideShorts();
+      }
     });
 
     observer.observe(document.body, {
@@ -11,33 +48,79 @@ chrome.storage.sync.get(['youtubeBlocked'], function (data) {
       subtree: true,
     });
 
-    hideYoutubeShorts();
+    // Initial hide
+    hideYoutubeShorts(processedElements);
+
+    // Set up periodic cleanup for better performance
+    setInterval(() => {
+      hideYoutubeShorts(processedElements);
+    }, 5000); // Check every 5 seconds for any missed elements
   }
 });
 
-function hideYoutubeShorts() {
+function hideYoutubeShorts(processedElements = new WeakSet()) {
+  // Cache selectors for better performance
+  const shortsSelectors = [
+    'a[href^="/shorts"]',
+    'ytd-reel-shelf-renderer',
+    'a[title="Shorts"]',
+  ];
+
+  // Use more specific selectors to avoid expensive operations
   const shortsElements = document.querySelectorAll('a[href^="/shorts"]');
+  let hiddenCount = 0;
+
   shortsElements.forEach((element) => {
+    // Skip if already processed
+    if (processedElements.has(element)) return;
+
     const container = element.closest(
-      'ytd-video-renderer, ytd-rich-section-renderer,ytd-reel-shelf-renderer'
+      'ytd-video-renderer, ytd-rich-section-renderer, ytd-reel-shelf-renderer'
     );
-    if (container) {
+    if (container && container.style.display !== 'none') {
       container.style.display = 'none';
+      processedElements.add(element);
+      processedElements.add(container);
+      hiddenCount++;
     }
   });
 
+  // Hide shorts tab if not already hidden
   const shortsTab = document.querySelector('a[title="Shorts"]');
-  if (shortsTab) {
+  if (shortsTab && shortsTab.style.display !== 'none') {
     shortsTab.style.display = 'none';
+    processedElements.add(shortsTab);
   }
 
-  const chipTextElements = document.querySelectorAll('div, button');
-  chipTextElements.forEach((element) => {
-    if (element.textContent.trim().toLowerCase() === 'shorts') {
-      const container = element.closest('#chip-shape-container');
-      if (container) {
+  // More efficient chip removal - only search in specific containers
+  const chipContainers = document.querySelectorAll('#chip-shape-container');
+  chipContainers.forEach((container) => {
+    if (processedElements.has(container)) return;
+
+    const chipTextElements = container.querySelectorAll('div, button');
+    chipTextElements.forEach((element) => {
+      if (element.textContent.trim().toLowerCase() === 'shorts') {
         container.remove();
+        processedElements.add(container);
+        return;
       }
+    });
+  });
+
+  // Hide reel shelf renderers directly
+  const reelShelves = document.querySelectorAll('ytd-reel-shelf-renderer');
+  reelShelves.forEach((shelf) => {
+    if (processedElements.has(shelf)) return;
+
+    if (shelf.style.display !== 'none') {
+      shelf.style.display = 'none';
+      processedElements.add(shelf);
+      hiddenCount++;
     }
   });
+
+  // Only log if something was actually hidden (for debugging)
+  if (hiddenCount > 0) {
+    console.log(`Shorts Blocker: Hidden ${hiddenCount} shorts elements`);
+  }
 }

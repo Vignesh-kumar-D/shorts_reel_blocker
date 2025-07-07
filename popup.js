@@ -5,10 +5,19 @@ document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.sync.get(
     ['youtubeBlocked', 'instagramBlocked'],
     function (data) {
-      youtubeToggle.checked = data.youtubeBlocked || true;
-      instagramToggle.checked = data.instagramBlocked || true;
-      chrome.storage.sync.set({ youtubeBlocked: youtubeToggle.checked });
-      chrome.storage.sync.set({ instagramBlocked: instagramToggle.checked });
+      // Set default values only if the keys don't exist in storage
+      if (data.youtubeBlocked === undefined) {
+        data.youtubeBlocked = true; // Default to blocked
+        chrome.storage.sync.set({ youtubeBlocked: true });
+      }
+      if (data.instagramBlocked === undefined) {
+        data.instagramBlocked = true; // Default to blocked
+        chrome.storage.sync.set({ instagramBlocked: true });
+      }
+
+      // Set the toggle states to the actual stored values
+      youtubeToggle.checked = data.youtubeBlocked;
+      instagramToggle.checked = data.instagramBlocked;
     }
   );
 
